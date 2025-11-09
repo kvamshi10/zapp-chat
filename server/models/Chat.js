@@ -171,16 +171,20 @@ chatSchema.methods.updateLastActivity = async function(messageId = null) {
 
 // Check if user is participant
 chatSchema.methods.isParticipant = function(userId) {
-  return this.participants.some(
-    p => p.user.toString() === userId.toString()
-  );
+  return this.participants.some(p => {
+    // Handle both populated and non-populated cases
+    const participantId = p.user._id || p.user;
+    return participantId.toString() === userId.toString();
+  });
 };
 
 // Get participant role
 chatSchema.methods.getParticipantRole = function(userId) {
-  const participant = this.participants.find(
-    p => p.user.toString() === userId.toString()
-  );
+  const participant = this.participants.find(p => {
+    // Handle both populated and non-populated cases
+    const participantId = p.user._id || p.user;
+    return participantId.toString() === userId.toString();
+  });
   return participant ? participant.role : null;
 };
 

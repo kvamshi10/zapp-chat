@@ -4,6 +4,29 @@ const User = require('../models/User');
 const Chat = require('../models/Chat');
 const { protect } = require('../middleware/auth');
 
+// @route   GET /api/users
+// @desc    Get all users (excluding current user)
+// @access  Private
+router.get('/', protect, async (req, res) => {
+  try {
+    const users = await User.find({ _id: { $ne: req.user._id } })
+      .select('username email avatar status isOnline lastSeen')
+      .sort({ username: 1 });
+
+    res.json({
+      success: true,
+      count: users.length,
+      users
+    });
+  } catch (error) {
+    console.error('Get users error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching users'
+    });
+  }
+});
+
 // @route   GET /api/users/search
 // @desc    Search users
 // @access  Private

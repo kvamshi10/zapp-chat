@@ -20,16 +20,16 @@ export default function NewChatModal({ onClose }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (searchQuery.length >= 2) {
-      searchUsers();
-    } else {
-      setUsers([]);
-    }
+    const timer = setTimeout(searchUsers, 300);
+    return () => clearTimeout(timer);
   }, [searchQuery]);
 
   const searchUsers = async () => {
     try {
-      const response = await api.get(`/users/search?query=${searchQuery}`);
+      // If no search query, get all users, otherwise search
+      const response = searchQuery 
+        ? await api.get(`/users/search?query=${searchQuery}`)
+        : await api.get('/users');
       setUsers(response.data.users);
     } catch (error) {
       console.error('Error searching users:', error);
@@ -219,14 +219,9 @@ export default function NewChatModal({ onClose }) {
 
           {/* Users list */}
           <div className="px-6 pb-4">
-            {users.length === 0 && searchQuery.length >= 2 && (
+            {users.length === 0 && (
               <p className="text-center text-gray-500 dark:text-gray-400 py-8">
-                No users found
-              </p>
-            )}
-            {users.length === 0 && searchQuery.length < 2 && (
-              <p className="text-center text-gray-500 dark:text-gray-400 py-8">
-                Type at least 2 characters to search
+                {searchQuery ? 'No users found' : 'Loading users...'}
               </p>
             )}
             <div className="space-y-2">

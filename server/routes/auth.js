@@ -102,10 +102,10 @@ router.post('/login', [
   try {
     const { username, password } = req.body;
 
-    // Find user by username or email
+    // Find user by username or email (case-insensitive)
     const user = await User.findOne({
       $or: [
-        { username: username },
+        { username: { $regex: new RegExp(`^${username}$`, 'i') } },
         { email: username.toLowerCase() }
       ]
     }).select('+password');
