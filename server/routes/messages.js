@@ -175,9 +175,19 @@ router.post('/send', protect, upload.array('attachments', 10), async (req, res) 
 
     // Check if user is a member of the chat
     const chat = await Chat.findById(chatId)
-      .populate('participants.user', 'publicKey');
+      .populate('participants.user', '_id publicKey');
     
-    if (!chat || !chat.isParticipant(req.user._id)) {
+    if (!chat) {
+      console.log(`❌ Chat not found: ${chatId}`);
+      return res.status(404).json({
+        success: false,
+        message: 'Chat not found'
+      });
+    }
+    
+    if (!chat.isParticipant(req.user._id)) {
+      console.log(`❌ User ${req.user._id} is not a participant of chat ${chatId}`);
+      console.log(`Chat participants:`, chat.participants.map(p => p.user._id || p.user));
       return res.status(403).json({
         success: false,
         message: 'You are not a member of this chat'

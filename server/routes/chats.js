@@ -111,6 +111,9 @@ router.post('/create', protect, async (req, res) => {
       joinedAt: new Date()
     }));
 
+    console.log(`📝 Creating chat with participants:`, participants);
+    console.log(`👥 Chat participants with roles:`, chatParticipants);
+
     // Create chat
     const chat = await Chat.create({
       name: isGroup ? name : null,
@@ -122,6 +125,8 @@ router.post('/create', protect, async (req, res) => {
         ? `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=200&bold=true`
         : null
     });
+    
+    console.log(`✅ Chat created successfully with ID: ${chat._id}`);
 
     // Populate the created chat
     const populatedChat = await Chat.findById(chat._id)
